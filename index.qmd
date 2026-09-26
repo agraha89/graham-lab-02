@@ -1,16 +1,21 @@
 ---
 title: "9041 Assignment 2"
-author: Selena Esteves
-date: today
-format: 
-    html:
-      toc: true
-      code-fold: true
-      code-summary: "Show code"
-      df-print: paged
+author: "Alana Graham"
+date: "September 25, 2026"
+format:
+  html:
+    toc: true
+    code-fold: true
+    code-summary: "Show code"
+    df-print: paged
 execute:
-    echo: false
-    warning: false
+  echo: false
+  warning: false
 ---
 
-
+## Intro
+## Methods
+## Participants
+## Measures
+## Data Analysis Strategy
+## Results
