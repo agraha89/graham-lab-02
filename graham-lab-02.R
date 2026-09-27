@@ -10,7 +10,6 @@ library(dplyr)
 library(janitor)
 
 readxl::read_excel("Attachment_Anxiety_Data.xlsx", sheet = 1)
-attachment_anxiety.df <- my_data
 
 #### Mutating Data ####
 attachment_anxiety.df <- my_data |> 
