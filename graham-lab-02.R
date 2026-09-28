@@ -151,7 +151,7 @@ Summary <- demographics_and_scores.df |>
        columns = c(mean, median, sd, range, alphas),
        decimals = 2) |> 
      cols_align(
-       align = "center",
+       align = "right",
        columns = c(mean, median, sd, range, alphas)) |> 
      tab_header(title = "Attachment Anxiety Descriptive Statistics")
 
@@ -184,7 +184,7 @@ Summary <- demographics_and_scores.df |>
        columns = c(mean, median, sd, range, alphas),
        decimals = 2) |> 
      cols_align(
-       align = "center",
+       align = "right",
        columns = c(mean, median, sd, range, alphas)) |> 
      tab_header(title = "Female Attachment Anxiety Descriptive Statistics")
    

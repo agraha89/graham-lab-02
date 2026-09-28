@@ -9,13 +9,18 @@ format:
     code-summary: "Show code"
     df-print: paged
 execute:
-  echo: false
+  echo: true
   warning: false
 ---
 
 ## Intro
 
+Thanks for reading this! It took me way too long to put together.
+
 ## Methods
+
+See the bulk of the background code work I did to complete this lab assignment, below:
+
 ```{r}
   #### Set-up ####
 library(tidyverse)
@@ -82,7 +87,7 @@ attachment_anxiety.df <- my_data |>
 attachment_anxiety_clean.df <- attachment_anxiety.df
 v_keys <- list(
   Social_Interaction_Anxiety = c("SA_1", "SA_2", "SA_3", "SA_4", "-SA_5", "SA_6", "SA_7", "SA_8", "-SA_9", "SA_10", "-SA_11", "SA_12", "SA_13", "SA_14", "SA_15", "SA_16", "SA_17", "SA_18", "SA_19", "SA_20"),
-  Close_Relationships_Anxiety = c("AA_1", "AA_2", "AA_3", "AA_4", "AA_5", "AA_6", "AA_7", "AA_8", "AA_9"),
+  Attachment_Anxiety = c("AA_1", "AA_2", "AA_3", "AA_4", "AA_5", "AA_6", "AA_7", "AA_8", "AA_9"),
   Self_Esteem = c("SEst_1", "-SEst_2", "SEst_3", "SEst_4", "-SEst_5", "-SEst_6", "SEst_7", "-SEst_8","-SEst_9", "SEst_10")) 
 
   SA_scores <- scoreItems(
@@ -94,7 +99,7 @@ v_keys <- list(
   )
 
 AA_scores <- scoreItems(
-  v_keys["Close_Relationships_Anxiety"],
+  v_keys["Attachment_Anxiety"],
   attachment_anxiety_clean.df,
   totals = F,
   min = 1,
@@ -114,8 +119,8 @@ allscores.df <- cbind(SA_scores.df, AA_scores.df, SE_scores.df)
 
 #### Combining Data Frames ####
 demographics_and_scores.df <- cbind(allscores.df, attachment_anxiety_clean.df) |> 
-select(Social_Interaction_Anxiety, Close_Relationships_Anxiety, Self_Esteem, Gender, `Age group`, Relationship, Ethnicity) |> 
-  mutate(Social_Interaction_Anxiety = as.integer(Social_Interaction_Anxiety), Close_Relationships_Anxiety = as.integer(Close_Relationships_Anxiety), Self_Esteem = as.integer(Self_Esteem))
+select(Social_Interaction_Anxiety, Attachment_Anxiety, Self_Esteem, Gender, `Age group`, Relationship, Ethnicity) |> 
+  mutate(Social_Interaction_Anxiety = as.integer(Social_Interaction_Anxiety), Attachment_Anxiety = as.integer(Attachment_Anxiety), Self_Esteem = as.integer(Self_Esteem))
 
 #### Demographics Table ####
 demographics.table <- bind_rows(demographics_and_scores.df |> 
@@ -134,6 +139,13 @@ demographics.table <- bind_rows(demographics_and_scores.df |>
       n,
       Percent = percent)) |> 
   
+    group_by(Variable) |> 
+  mutate(
+    Variable = if_else(
+      row_number() == 1,
+      Variable, "")) |> 
+  ungroup() |> 
+  
   gt() |> 
   fmt_percent(
     columns = Percent,
@@ -144,7 +156,7 @@ demographics.table <- bind_rows(demographics_and_scores.df |>
 #### Score Table ####
 Summary <- demographics_and_scores.df |> 
   select(Social_Interaction_Anxiety,
-         Close_Relationships_Anxiety,
+         Attachment_Anxiety,
          Self_Esteem) |> 
   describe()
 
@@ -153,12 +165,16 @@ Summary <- demographics_and_scores.df |>
 Summary <- Summary |> 
     mutate(Scales = c(
       "Social Interaction Anxiety",
-      "Close Relationships Anxiety",
+      "Attachment Anxiety",
       "Self-Esteem")) |> 
     mutate(alphas = round(c(SA_scores$alpha,
                       AA_scores$alpha,
                       SE_scores$alpha), 2)) |> 
-    select(Scales, mean, median, sd, range, alphas) 
+    select(Scales, mean, median, sd, range, alphas)
+
+m_SA <- round(Summary$mean[1], 2)
+m_AA <- round(Summary$mean[2], 2) 
+m_SE <- round(Summary$mean[3], 2)
     
    Score_Table <- Summary |> 
     gt() |> 
@@ -168,7 +184,7 @@ Summary <- Summary |>
      cols_align(
        align = "right",
        columns = c(mean, median, sd, range, alphas)) |> 
-     tab_header(title = "Attachment Anxiety Descriptive Statistics")
+     tab_header(title = "Social Anxiety and Self-Esteem Descriptive Statistics")
 
 #### Filtered Score Table ####
    female.df <- demographics_and_scores.df |> 
@@ -176,7 +192,7 @@ Summary <- Summary |>
    
    Filtered_Summary <- female.df |> 
      select(Social_Interaction_Anxiety,
-            Close_Relationships_Anxiety,
+            Attachment_Anxiety,
             Self_Esteem) |> 
      describe()
    
@@ -185,12 +201,16 @@ Summary <- Summary |>
    Filtered_Summary <- Filtered_Summary |> 
      mutate(Scales = c(
        "Social Interaction Anxiety",
-       "Close Relationships Anxiety",
+       "Attachment Anxiety",
        "Self-Esteem")) |> 
      mutate(alphas = round(c(SA_scores$alpha,
                              AA_scores$alpha,
                              SE_scores$alpha), 2)) |> 
      select(Scales, mean, median, sd, range, alphas) 
+   
+filtered_m_SA <- round(Filtered_Summary$mean[1], 2)
+filtered_m_AA <- round(Filtered_Summary$mean[2], 2)
+filtered_m_SE <- round(Filtered_Summary$mean[3], 2)
    
    Filtered_Score_Table <- Filtered_Summary |> 
      gt() |> 
@@ -200,20 +220,32 @@ Summary <- Summary |>
      cols_align(
        align = "right",
        columns = c(mean, median, sd, range, alphas)) |> 
-     tab_header(title = "Female Attachment Anxiety Descriptive Statistics")
+     tab_header(title = "Female Social Anxiety and Self-Esteem Descriptive Statistics")
 ```
 
 ## Participants
+
 The sample consisted of `r N` participants.
+
 ```{r}
 demographics.table
 ```
 
 ## Measures
 
+The measures used for this assignment include three scales: Social interaction anxiety (α = `r round(c(SA_scores$alpha), 2)`), attachment-related anxiety (α = `r round(c(AA_scores$alpha), 2)`), and self-esteem (α = `r round(c(SE_scores$alpha), 2)`).
+
 ## Data Analysis Strategy
+When scoring (i.e., averaging) the scales, I reverse-keyed items 5, 9, and 11 in the Social Interaction Anxiety Scale responses and items 2, 5, 6, 8, and 9 in the Rosenberg Self-Esteem Scale using the scoreItems() function.
 
 ## Results
+View the descriptive statistics for the total sample of responses to the Social Interaction Anxiety Scale (M = `r m_SA`), the Attachment-Related Anxiety subscale (M = `r m_AA`), and the Rosenberg Self-Esteem Scale (M = `r m_SE`).
 ```{r}
 Score_Table
 ```
+View the descriptive statistics for the female sub-sample of responses to the Social Interaction Anxiety Scale (M = `r filtered_m_SA`), the Attachment-Related Anxiety subscale (M = `r filtered_m_AA`), and the Rosenberg Self-Esteem Scale (M = `r filtered_m_SE`).
+```{r}
+Filtered_Score_Table
+```
+
+
